@@ -1,0 +1,65 @@
+---
+
+## Check
+
+- name: Check variables
+  ansible.builtin.assert:
+    that:
+      - ansible_user_uid is defined
+      - ansible_user_gid is defined
+
+## Init
+
+- name: Ensure project directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ target_user | default(omit) }}"
+    group: "{{ target_group | default(target_user | default(omit)) }}"
+    mode: '0755'
+  loop:
+    - "{{ docker_project_path }}"
+    - "{{ docker_project_path }}/config"
+    - "{{ docker_project_path }}/data"
+  tags: ["init"]
+
+- name: Check for custom files
+  delegate_to: localhost
+  ansible.builtin.stat:
+    path: "config/wikijs/{{ inventory_hostname }}/"
+  register: _custom_files
+
+- name: Copy custom files
+  ansible.builtin.copy:
+    src: "config/wikijs/{{ inventory_hostname }}/"
+    dest: "{{ docker_project_path }}/"
+    directory_mode : '0755'
+    mode:            '0644'
+  when:
+    - _custom_files.stat.exists
+    - _custom_files.stat.isdir
+
+## Configure
+
+- name: Template docker-compose.yml
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ docker_project_path }}/docker-compose.yml"
+    owner: "{{ target_user | default(omit) }}"
+    group: "{{ target_group | default(target_user | default(omit)) }}"
+    mode: '0644'
+    validate: "{{ docker_cli }} compose -f %s config"
+    backup: true
+
+- name: Template config.yml
+  ansible.builtin.template:
+    src: config.yml.j2
+    dest: "{{ docker_project_path }}/config/config.yml"
+    owner: "{{ target_user | default(omit) }}"
+    group: "{{ target_group | default(target_user | default(omit)) }}"
+    mode: '0644'
+
+## Run
+
+- name: Start app
+  ansible.builtin.include_role: { name: djuuu.docker_project, tasks_from: compose-up }

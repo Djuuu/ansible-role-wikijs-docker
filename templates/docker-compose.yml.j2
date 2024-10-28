@@ -1,0 +1,51 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+# {{ ansible_managed }}
+# {{ template_fullpath }}
+
+name: {{ docker_project_slug }}
+
+services:
+
+  wikijs:
+    image: lscr.io/linuxserver/wikijs:{{ wikijs_image_version }}
+    container_name: {{ docker_project_slug }}
+    restart: unless-stopped
+
+    {{ docker_project_compose_service_additional_options | indent(4) }}
+
+    networks:
+      - default
+      {% for item in wikijs_compose_additional_networks %}
+      - {{ item }}
+      {% endfor %}
+
+    environment:
+      - PUID={{ target_user_uid | default(ansible_user_uid) }}
+      - PGID={{ target_user_gid | default(ansible_user_gid) }}
+      - TZ={{ timezone | default('UTC') }}
+
+      - DB_TYPE={{ wikijs_db_type }}
+      - DB_HOST={{ wikijs_db_host }}
+      - DB_PORT={{ wikijs_db_port }}
+      - DB_NAME={{ wikijs_db_name }}
+      - DB_USER={{ wikijs_db_user }}
+      - DB_PASS={{ wikijs_db_pass }}
+
+    volumes:
+      - ./config:/config
+      - ./data:/data
+      {% for item in wikijs_compose_additional_volumes %}
+      - {{ item }}
+      {% endfor %}
+
+    labels:
+      {{ traefik_project_base_labels | indent(6) }}
+
+networks:
+  {{ docker_project_default_network | indent(2) }}
+  {% for item in wikijs_compose_additional_networks %}
+  {{ item }}:
+    external: true
+  {% endfor %}
+
+{{ docker_project_compose_additional_options }}

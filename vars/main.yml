@@ -1,0 +1,3 @@
+---
+
+docker_project_name: "{{ wikijs_project_name }}"
