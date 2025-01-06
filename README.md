@@ -35,7 +35,7 @@ Available role variables are listed below, along with default values (see `defau
 
 wikijs_project_name: wikijs
 
-# Docker project dynamic vars (uses `docker_project_name` prefix, adapt if overriden)
+# Docker project dynamic vars (uses `docker_project_name` prefix, adapt if overridden)
 
 wikijs_traefik_loadbalancer_server_port: 3000
 wikijs_traefik_entrypoints: 'http,https'
