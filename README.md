@@ -37,13 +37,17 @@ wikijs_project_name: wikijs
 
 # Docker project dynamic vars (uses `docker_project_name` prefix, adapt if overridden)
 
+# Additional external docker-compose networks, joined by main service
+wikijs_additional_networks: []
+#  - postgres_default
+
 wikijs_traefik_loadbalancer_server_port: 3000
 wikijs_traefik_entrypoints: 'http,https'
 wikijs_traefik_middlewares:
   - "https-redirect@file"
 
 # Main service additional docker-compose options (ex: cpu_shares, deploy, ...)
-wikijs_compose_service_additional_options: |
+wikijs_service_additional_options: |
   #ports:
   #  - 3000:3000
 ```
@@ -51,12 +55,8 @@ wikijs_compose_service_additional_options: |
 ```yaml
 # WikiJS docker-compose vars
 
-# Additional external docker-compose networks (ex: database)
-wikijs_compose_additional_networks: []
-#  - postgres_default
-
 # Additional volumes (ex: override assets)
-wikijs_compose_additional_volumes: []
+wikijs_additional_volumes: []
 #  - ./favicons:/app/wiki/assets/favicons
 #  - ./favicon.ico:/app/wiki/assets/favicon.ico
 #  - ./manifest.json:/app/wiki/assets/manifest.json
