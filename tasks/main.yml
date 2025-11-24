@@ -48,7 +48,7 @@
     owner: "{{ target_user | default(omit) }}"
     group: "{{ target_group | default(target_user | default(omit)) }}"
     mode: '0644'
-    validate: "{{ docker_cmd }} compose -f %s config"
+    validate: "{{ docker_compose_cmd }} -f %s config"
     backup: true
 
 - name: Template config.yml
