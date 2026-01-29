@@ -16,8 +16,8 @@ services:
     {{ docker_project_service_additional_options | indent(4) }}
 
     environment:
-      - PUID={{ target_user_uid | default(ansible_user_uid) }}
-      - PGID={{ target_user_gid | default(ansible_user_gid) }}
+      - PUID={{ target_user_uid | default(ansible_facts['user_uid']) }}
+      - PGID={{ target_user_gid | default(ansible_facts['user_gid']) }}
       - TZ={{ timezone | default('UTC') }}
 
       - DB_TYPE={{ wikijs_db_type }}
